@@ -1,0 +1,28 @@
+{
+  "name": "aristotel",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "lodash -d -o src/lodash.js exports=commonjs include=isObject,isUndefined,isNull,isFunction,isArray,extend,isString,once,contains,findLast && browserify src/art.js | uglifyjs -m -c unused,booleans,conditionals,dead_code,if_return,join_vars > dist/art.js && rm src/lodash.js && uglifyjs -m -c if_return,join_vars,conditionals,booleans src/snippet.js > dist/snippet.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BrandyMint/aristotel.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BrandyMint/aristotel/issues"
+  },
+  "homepage": "https://github.com/BrandyMint/aristotel#readme",
+  "dependencies": {
+    "lodash": "^3.10.1"
+  },
+  "devDependencies": {
+    "browserify": "^12.0.1",
+    "lodash-cli": "^3.10.1",
+    "uglify-js": "^2.6.1"
+  }
+}
