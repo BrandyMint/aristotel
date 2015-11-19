@@ -415,17 +415,17 @@ var queue = (function queue() {
     var path = getElPath(target);
 
     var props = {
-      type: truncate(type, SHORT_PARAM_STR_LIMIT),
-      tagName: truncate(target.tagName.toLowerCase(), SHORT_PARAM_STR_LIMIT),
-      classes: truncate(truncateClasses(klass), SHORT_PARAM_STR_LIMIT),
-      id: truncate(getAttr(target, 'id'), SHORT_PARAM_STR_LIMIT),
-      href: truncate(getHref(target), PARAM_STR_LIMIT),
-      path: path
+      t: truncate(type, SHORT_PARAM_STR_LIMIT),
+      n: truncate(target.tagName.toLowerCase(), SHORT_PARAM_STR_LIMIT),
+      l: truncate(truncateClasses(klass), SHORT_PARAM_STR_LIMIT),
+      i: truncate(getAttr(target, 'id'), SHORT_PARAM_STR_LIMIT),
+      f: truncate(getHref(target), PARAM_STR_LIMIT),
+      w: path
     };
     
     if (!(config.disableTextCapture || type === 'change' ||
           target.isContentEditable || !_.isString(getText(target)))) {
-      props.text = truncate(getText(target).replace(/^\s+|\s+$/g, ''), TEXT_PARAM_STR_LIMIT);
+      props.x = truncate(getText(target).replace(/^\s+|\s+$/g, ''), TEXT_PARAM_STR_LIMIT);
     }
 
     return props;
@@ -497,19 +497,19 @@ function getSearchTerm(query) {
 function collectPageParams() {
   var referrer = stripHash(currentReferrer);
   var p = {
-    type: pageChangeType,
-    hash: truncate(window.location.hash, PARAM_STR_LIMIT),
-    path: truncate(window.location.pathname, PARAM_STR_LIMIT),
-    query: truncate(window.location.search, PARAM_STR_LIMIT),
-    domain: truncate(window.location.hostname, PARAM_STR_LIMIT),
-    title: truncate(document.title, SHORT_PARAM_STR_LIMIT),
-    referrer: truncate(referrer, PARAM_STR_LIMIT),
-    searchTerm: truncate(getSearchTerm(referrer), PARAM_STR_LIMIT),
-    utm_source: truncate(getQueryParam('utm_source'), PARAM_STR_LIMIT),
-    utm_medium: truncate(getQueryParam('utm_medium'), PARAM_STR_LIMIT),
-    utm_term: truncate(getQueryParam('utm_term'), PARAM_STR_LIMIT),
-    utm_content: truncate(getQueryParam('utm_content'), PARAM_STR_LIMIT),
-    utm_campaign: truncate(getQueryParam('utm_campaign'), PARAM_STR_LIMIT)
+    t: pageChangeType,
+    h: truncate(window.location.hash, PARAM_STR_LIMIT),
+    p: truncate(window.location.pathname, PARAM_STR_LIMIT),
+    q: truncate(window.location.search, PARAM_STR_LIMIT),
+    d: truncate(window.location.hostname, PARAM_STR_LIMIT),
+    g: truncate(document.title, SHORT_PARAM_STR_LIMIT),
+    r: truncate(referrer, PARAM_STR_LIMIT),
+    e: truncate(getSearchTerm(referrer), PARAM_STR_LIMIT),
+    us: truncate(getQueryParam('utm_source'), PARAM_STR_LIMIT),
+    um: truncate(getQueryParam('utm_medium'), PARAM_STR_LIMIT),
+    ut: truncate(getQueryParam('utm_term'), PARAM_STR_LIMIT),
+    uc: truncate(getQueryParam('utm_content'), PARAM_STR_LIMIT),
+    ug: truncate(getQueryParam('utm_campaign'), PARAM_STR_LIMIT)
   };
 
   var params = buildReq();
@@ -577,11 +577,11 @@ function getSessionParams() {
 function setSessionParams(params) {
   window.art.userId = params[0];
   var s = {
-    appId: appId,
-    userId: params[0],
-    visitId: params[1],
-    sessionId: params[2],
-    media: 'web'
+    a: appId,
+    u: params[0],
+    v: params[1],
+    s: params[2],
+    m: 'web'
   };
   
   var p = buildReq();
