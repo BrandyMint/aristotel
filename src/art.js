@@ -235,7 +235,7 @@ function imgRequest(params, cb) {
       cb && cb();
     };
 
-    img.src = IMG_REQUEST_RESOURCE + '?' + sessParams + '&' + params + '&time=' + (new Date()).getTime();
+    img.src = IMG_REQUEST_RESOURCE + '?' + sessParams + '&' + params + '&tm=' + (new Date()).getTime();
     lastReqTime = (new Date()).getTime() + REQUEST_TIMEOUT;
   }
 }
