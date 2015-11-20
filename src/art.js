@@ -38,6 +38,7 @@ var submitQueue = [];
 var lastButton = void 0;
 var lastTarget = void 0;
 var appId = window.art.appId;
+var networkErr = void 0;
 
 //TODO:
 var oldIe = void 0;
@@ -228,8 +229,12 @@ function setCookieSession() {
 }
 
 function imgRequest(params, cb) {
-  if (params) {
+  if (params && !networkErr) {
     var img = new Image(1, 1);
+    img.onerror = function () {
+      networkErr = true;
+    };
+    
     img.onload = function () {
       lastReqTime = 0;
       cb && cb();
