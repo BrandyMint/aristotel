@@ -29,7 +29,7 @@ var config = _.extend({
   secureCookie: false
 }, (window['art'] || {})['config']);
 
-var IMG_REQUEST_RESOURCE = config.requestUrl || getUrl('3009.vkontraste.ru/a');
+var IMG_REQUEST_RESOURCE = config.requestUrl || getUrl('cdn.1clickanalytics.ru/a.png');
 var currentLocation = window.location.pathname + window.location.hash;
 var currentDomain = document.domain;
 var currentReferrer = document.referrer;
