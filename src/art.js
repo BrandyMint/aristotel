@@ -27,9 +27,10 @@ var config = _.extend({
   disableTextCapture: false,
   forceSSL: false,
   secureCookie: false
-}, (window['art'] || {})['config']);
+}, (window.art || {})['config']);
 
-var IMG_REQUEST_RESOURCE = config.requestUrl || getUrl('cdn.1clickanalytics.ru/a.png');
+var IMG_REQUEST_RESOURCE = getUrl(config.requestUrl || 'cdn.1clickanalytics.ru/a.png');
+var idApi = getUrl('cdn.1clickanalytics.ru/api/id'); // TODO: put actual api endpoint
 var currentLocation = window.location.pathname + window.location.hash;
 var currentDomain = document.domain;
 var currentReferrer = document.referrer;
@@ -39,18 +40,19 @@ var lastButton = void 0;
 var lastTarget = void 0;
 var appId = window.art.appId;
 var networkErr = void 0;
+var delayedEvs = [];
+var customProps = {};
 
-//TODO:
 var oldIe = void 0;
 var appVer;
 if (window.navigator && (appVer = window.navigator.appVersion)) {
-  if (appVer.indexOf("MSIE 6.") > -1) {
+  if (appVer.indexOf('MSIE 6.') > -1) {
     oldIe = 6;
     REQ_CHUNK_LIMIT = 1700;
-  } else if (appVer.indexOf("MSIE 7.") > -1) {
+  } else if (appVer.indexOf('MSIE 7.') > -1) {
     oldIe = 7;
     REQ_CHUNK_LIMIT = 1900;
-  } else if (appVer.indexOf("MSIE 8.") > -1) {
+  } else if (appVer.indexOf('MSIE 8.') > -1) {
     oldIe = 8;
   }
 }
@@ -169,6 +171,7 @@ function startMainLoop() {
     mainLoopStarted = true;
     sendPageVisit();
     queue.startLoop();
+    runDelayed(delayedEvs);
   }, 0);
   return true;
 }
@@ -228,6 +231,20 @@ function setCookieSession() {
   setCookie(getInnerCookieName('session'), '*', SESSION_DURATION);
 }
 
+function setCookieProps(props) {
+  setCookie(getInnerCookieName('props'), JSON.stringify(props), USER_DURATION);
+}
+
+function getCookieProps() {
+  var cookie, props;
+  try {
+    cookie = getCookie(getInnerCookieName('props'));
+    props = JSON.parse(cookie);
+  } catch(e) {};
+
+  return props || {};
+}
+
 function imgRequest(params, cb) {
   if (params && !networkErr) {
     var img = new Image(1, 1);
@@ -248,6 +265,14 @@ function imgRequest(params, cb) {
 function jsonpRequest(resource, params, cb) {
   
 }
+
+function runDelayed(evArr) {
+  for(var i = 0; i > evArr.length; i++) {
+    var fn = evArr[i][0];
+    window.art[fn].apply(this, evArr[i].slice(1));
+  }
+}
+
 
 function buildReq(fl) {
   var str = '';
@@ -499,6 +524,20 @@ function getSearchTerm(query) {
   return '';
 }
 
+function prepareProps(props) {
+  return _.isObject(props)
+    ? _(props)
+        .chain()
+        .pick(function(val, key, obj) {
+          return obj.hasOwnProperty(key) &&
+            !(_.isUndefined(val) || _.isNull(val) || val === '');
+        })
+        .map(function(val, key) { return [key, val.toString()]; })
+        .flatten()
+        .value()
+    : [];
+}
+
 function collectPageParams() {
   var referrer = stripHash(currentReferrer);
   var p = {
@@ -514,7 +553,8 @@ function collectPageParams() {
     um: truncate(getQueryParam('utm_medium'), PARAM_STR_LIMIT),
     ut: truncate(getQueryParam('utm_term'), PARAM_STR_LIMIT),
     uc: truncate(getQueryParam('utm_content'), PARAM_STR_LIMIT),
-    ug: truncate(getQueryParam('utm_campaign'), PARAM_STR_LIMIT)
+    ug: truncate(getQueryParam('utm_campaign'), PARAM_STR_LIMIT),
+    k: prepareProps(customProps)
   };
 
   var params = buildReq();
@@ -601,6 +641,7 @@ function initSessionData() {
 
 function sendPageVisit() {
   initSessionData();
+  customProps = getCookieProps();
   var params = collectPageParams();
   imgRequest(params);
 }
@@ -789,8 +830,77 @@ function onBeforeUnload() {
 
 addEventListener(window, 'beforeunload', onBeforeUnload, true);
 
-if (!window['art'].loaded) {
-  window['art'].loaded = true;
+window.art || (window.art = []);
+if (!window.art.loaded) {
+  var oldArt = window.art;
+
+  window.art = {
+    appId: appId,
+    config: config,
+    loaded: true,
+    identify: function (params) {
+      var paramStr, pName, req, reqStr, pColl;
+
+      if (!mainLoopStarted) {
+        delayedEvs.push([ 'identify', params ]);
+        return;
+      }
+
+      pColl = {};
+      req = buildReq();
+
+      if (_.isObject(params)) {
+        for (pName in params) {
+          if (params.hasOwnProperty(pName)) {
+            if (!_.isObject(params[pName])) {
+              paramStr = truncate(params[pName], SHORT_PARAM_STR_LIMIT);
+              pColl[truncate(pName, SHORT_PARAM_STR_LIMIT)] = paramStr;
+            }
+          }
+        }
+        req.add(pColl);
+        reqStr = req.build();
+        jsonpRequest(idApi, reqStr, function (res) {
+          var idCookie, ids;
+
+          if (res && res.uid) {
+            idCookie = getCookie(getInnerCookieName('id'));
+            ids = idCookie.split('.');
+            setCookieId(res.uid, ids[1], ids[2]);
+            initSessionData();
+          }
+        });
+      }
+    },
+    track: function (name, props) {
+      if (_.isString(name)) {
+        var data = {
+          t: name,
+          k: prepareProps(_.extend({}, customProps, props))
+        };
+        
+        queue.queue(data);
+        queue.flush();
+      }
+    },
+    setEventProperties: function (props) {
+      customProps = getCookieProps();
+      _.exdend(customProps, props);
+      setCookieProps(customProps);
+    },
+    unsetEventProperty: function (name) {
+      customProps = getCookieProps();
+      delete customProps[name];
+      setCookieProps(customProps);
+    },
+    clearEventProperties: function () {
+      customProps = {};
+      setCookieProps(customProps);
+    }
+  };
+
+  runDelayed(oldArt);
+
   addEventListener(window, 'click', handleClick, true);
   addEventListener(window, 'submit', handleSubmit, true);
 }
