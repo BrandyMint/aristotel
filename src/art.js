@@ -29,7 +29,7 @@ var config = _.extend({
   secureCookie: false
 }, (window.art || {})['config']);
 
-var IMG_REQUEST_RESOURCE = getUrl(config.requestUrl || 'cdn.1clickanalytics.ru/a.png');
+var IMG_REQUEST_RESOURCE = getUrl(config.requestUrl || 'cdn.1clickanalytics.ru/a.gif');
 var idApi = getUrl('cdn.1clickanalytics.ru/api/id'); // TODO: put actual api endpoint
 var currentLocation = window.location.pathname + window.location.hash;
 var currentDomain = document.domain;
