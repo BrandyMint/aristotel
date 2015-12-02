@@ -262,8 +262,27 @@ function imgRequest(params, cb) {
   }
 }
 
-function jsonpRequest(resource, params, cb) {
-  
+function jsonpRequest(api, params, cb) {
+  var el, s;
+
+  if (params) {
+    params = params ? '&' + params : '';
+    window._artjsonpcbfn = cb;
+    el = document.head || document.getElementsByTagName('head')[0] || document.documentElement;
+    s = document.createElement('script');
+    s.async = 'async';
+    s.src = api + '?' + sessParams + params + '&callback=_artjsonpcbfn';
+    s.onload = s.onreadystatechange = function() {
+      if (!s.readyState || /loaded|complete/.test(s.readyState)) {
+        s.onload = s.onreadystatechange = null;
+        if (el && s.parentNode) {
+          el.removeChild(s);
+        }
+        s = void 0;
+      }
+    };
+    el.insertBefore(s, el.firstChild);
+  }
 }
 
 function runDelayed(evArr) {
