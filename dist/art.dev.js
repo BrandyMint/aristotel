@@ -287,7 +287,7 @@ function jsonpRequest(api, params, cb) {
 }
 
 function runDelayed(evArr) {
-  for(var i = 0; i > evArr.length; i++) {
+  for(var i = 0; i < evArr.length; i++) {
     var fn = evArr[i][0];
     window.art[fn].apply(this, evArr[i].slice(1));
   }
@@ -859,6 +859,7 @@ if (!window.art.loaded) {
     config: config,
     loaded: true,
     identify: function (params) {
+      var idParams = [ 'handle', 'email' ];
       var paramStr, pName, req, reqStr, pColl;
 
       if (!mainLoopStarted) {
@@ -874,7 +875,7 @@ if (!window.art.loaded) {
           if (params.hasOwnProperty(pName)) {
             if (!_.isObject(params[pName])) {
               paramStr = truncate(params[pName], SHORT_PARAM_STR_LIMIT);
-              pColl[truncate(pName, SHORT_PARAM_STR_LIMIT)] = paramStr;
+              pColl[truncate(_.indexOf(idParams, pName) > -1 ? pName.charAt(0) : pName, SHORT_PARAM_STR_LIMIT)] = paramStr;
             }
           }
         }
