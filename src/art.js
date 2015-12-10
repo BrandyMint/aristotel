@@ -30,7 +30,7 @@ var config = _.extend({
 }, (window.art || {})['config']);
 
 var IMG_REQUEST_RESOURCE = getUrl(config.requestUrl || 'cdn.1clickanalytics.ru/a.gif');
-var idApi = getUrl(config.apiUrl || 'api.1clickanalytics.ru/identify');
+var idApi = getUrl(config.apiUrl || 'api.1clickanalytics.ru/v1/identify');
 var currentLocation = window.location.pathname + window.location.hash;
 var currentDomain = document.domain;
 var currentReferrer = document.referrer;

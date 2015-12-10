@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "lodash -d -o src/lodash.js exports=commonjs include=isObject,isUndefined,isNull,isFunction,isArray,extend,isString,once,contains,findLast,chain,pick,map,flatten,value && browserify src/art.js | uglifyjs -m -c unused,booleans,conditionals,dead_code,if_return,join_vars > dist/art.js && rm src/lodash.js && uglifyjs -m -c if_return,join_vars,conditionals,booleans src/snippet.js > dist/snippet.js"
+    "build": "lodash -d -o src/lodash.js exports=commonjs include=isObject,isUndefined,isNull,isFunction,isArray,extend,isString,once,contains,findLast,chain,pick,map,flatten,value && browserify src/art.js > dist/art.dev.js && uglifyjs dist/art.dev.js -m -c unused,booleans,conditionals,dead_code,if_return,join_vars -o dist/art.js && rm src/lodash.js && uglifyjs -m -c if_return,join_vars,conditionals,booleans src/snippet.js > dist/snippet.js"
   },
   "repository": {
     "type": "git",
