@@ -12,3 +12,6 @@ window.art=window.art||[],art.load=function(t,r){art.appId=t,art.config=r=r||{};
 </script>
 <!-- /OneClickAnalytics counter -->
 ```
+
+
+Исходник: https://github.com/BrandyMint/aristotel/blob/master/dist/snippet.js
